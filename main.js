@@ -21,9 +21,9 @@ require([
     ground: "world-elevation",
     layers: [
       layers.hukou,
+      layers.contours,
       layers.landuseGroup,
       layers.canalGroup,
-      layers.contours,
       layers.riverGroup,
       layers.ponds,
       layers.activeWeirGroup,

@@ -8,6 +8,25 @@
   <style>
     html,body,#viewDiv{margin:0;height:100%;width:100%;}
     .esri-layer-list__item-actions-menu{display:none!important;}
+    .esri-basemap-gallery {
+      max-width: 220px !important;
+      min-width: 180px !important;
+      width: auto !important;
+    }
+
+    /* 橫向排列 BasemapGallery 項目 */
+    .esri-basemap-gallery__grid {
+      display: flex !important;
+      flex-direction: row !important;
+      overflow-x: auto !important;
+      gap: 8px;
+      padding-bottom: 8px;
+      max-width: 100vw;
+    }
+    .esri-basemap-gallery__item {
+      min-width: 100px;
+      max-width: 160px;
+    }
   </style>
 </head>
 <body>

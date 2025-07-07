@@ -120,11 +120,11 @@ define([
   // 湖口工作站
   const hukou = new FeatureLayer({
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/hukou_workstation/FeatureServer",
-    title: "湖口工作站",
+    title: "湖口工作站範圍",
     visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
-        color: [255,0,0,0.9], width: 4, style: "solid"
+        color: [0,0,0,1], width: 5, style: "solid"
       })
     }),
     popupTemplate: { title: "{名稱}", content: "OID：{OBJECTID}" }
@@ -135,49 +135,65 @@ define([
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/landuse/FeatureServer/6",
     title: "所有權人類型",
     visible: true,
-    renderer: new SimpleRenderer({
-      symbol: new SimpleFillSymbol({
-        color: [255, 200, 0, 0.3],
-        outline: { color: [255, 200, 0, 0.9], width: 2 }
-      })
-    }),
-    popupTemplate: { title: "{名稱}", content: "面積：{Shape_Area}" }
+    renderer: {
+      type: "unique-value",
+      field: "類型",
+      uniqueValueInfos: [
+        {
+          value: "國有",
+          symbol: {
+            type: "simple-fill",
+            color: [29, 79, 96, 1],
+            outline: { color: [0, 0, 0, 1], width: 0.1}
+          },
+          label: "國有"
+        },
+        {
+          value: "私有",
+          symbol: {
+            type: "simple-fill",
+            color: [196, 230, 195, 1],
+            outline: { color: [0, 0, 0, 1], width: 0.1}
+          },
+          label: "私有"
+        }
+      ]
+    }
   });
   const landuse_water = new FeatureLayer({
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/landuse/FeatureServer/7",
     title: "水利用地",
-    visible: true,
+    visible: false,
     renderer: new SimpleRenderer({
       symbol: new SimpleFillSymbol({
-        color: [0, 120, 255, 0.3],
-        outline: { color: [0, 120, 255, 0.9], width: 2 }
+        color: [0, 77, 168, 1],
+        outline: { color: [0, 0, 0, 1], width: 0.1}
       })
-    }),
-    popupTemplate: { title: "{名稱}", content: "面積：{Shape_Area}" }
+    })
   });
   const landuse_group = new FeatureLayer({
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/landuse/FeatureServer/8",
     title: "水利小組",
-    visible: true,
+    visible: false,
     renderer: new SimpleRenderer({
       symbol: new SimpleFillSymbol({
         color: [0, 200, 100, 0.3],
-        outline: { color: [0, 200, 100, 0.9], width: 2 }
+        outline: { color: [0, 0, 0, 0.9], width: 1}
       })
     }),
     popupTemplate: { title: "{名稱}", content: "面積：{Shape_Area}" }
   });
   const landuseGroup = new GroupLayer({
     title: "土地利用",
-    visibilityMode: "independent",
+    visibilityMode: "exclusive",
     visible: false,
-    layers: [landuse_owner, landuse_water, landuse_group]
+    layers: [landuse_group, landuse_water, landuse_owner]
   });
 
   // 堤塘_有高程
   const ponds = new FeatureLayer({
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/ponds/FeatureServer",
-    title: "堤塘_有高程",
+    title: "堤塘",
     visible: false,
     renderer: new SimpleRenderer({
       symbol: new SimpleFillSymbol({
@@ -235,7 +251,7 @@ define([
   });
   const canal_drain = new FeatureLayer({
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/canal/FeatureServer/22",
-    title: "大排中排小排",
+    title: "大、中、小排",
     visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
@@ -249,13 +265,13 @@ define([
     title: "圳路",
     visibilityMode: "independent",
     visible: false,
-    layers: [canal_main, canal_branch, canal_sub, canal_intake, canal_drain]
+    layers: [canal_drain, canal_intake, canal_sub, canal_branch, canal_main]
   });
 
   // 河川相關圖層
   const river_main = new FeatureLayer({
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river/FeatureServer/13",
-    title: "河川_河道",
+    title: "河道",
     visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
@@ -266,7 +282,7 @@ define([
   });
   const river_branch = new FeatureLayer({
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river/FeatureServer/14",
-    title: "河川_支流",
+    title: "支流",
     visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
@@ -287,16 +303,16 @@ define([
     popupTemplate: { title: "{名稱}", content: "OID：{OBJECTID}" }
   });
   const riverGroup = new GroupLayer({
-    title: "河川相關圖層",
+    title: "河川",
     visibilityMode: "independent",
     visible: false,
-    layers: [river_main, river_branch, river_drain]
+    layers: [river_drain, river_branch, river_main]
   });
 
   // 使用中河水堰群組
   const activeWeir_owner = new FeatureLayer({
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/active_river_weirs/FeatureServer/1",
-    title: "河水堰_有水權",
+    title: "有水權",
     visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleMarkerSymbol({
@@ -310,7 +326,7 @@ define([
   });
   const activeWeir_active = new FeatureLayer({
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/active_river_weirs/FeatureServer/2",
-    title: "河水堰_使用中",
+    title: "使用中",
     visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleMarkerSymbol({
@@ -332,7 +348,7 @@ define([
   // 等高線
   const contours = new FeatureLayer({
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/contours_10m/FeatureServer",
-    title: "等高線_10公尺間距",
+    title: "等高線 (10公尺)",
     visible: false,
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
