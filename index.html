@@ -2,35 +2,104 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
-  <title>全群組圖層顯示同步開關</title>
-  <link rel="stylesheet" href="https://js.arcgis.com/4.33/esri/themes/light/main.css"/>
+  <title>湖口工作站3D視覺化輔助決策平台</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.33/esri/themes/dark/main.css"/>
   <script src="https://js.arcgis.com/4.33/"></script>
+  <link rel="stylesheet" href="style.css">
   <style>
-    html,body,#viewDiv{margin:0;height:100%;width:100%;}
-    .esri-layer-list__item-actions-menu{display:none!important;}
-    .esri-basemap-gallery {
-      max-width: 220px !important;
-      min-width: 180px !important;
-      width: auto !important;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    /* 橫向排列 BasemapGallery 項目 */
-    .esri-basemap-gallery__grid {
-      display: flex !important;
-      flex-direction: row !important;
-      overflow-x: auto !important;
-      gap: 8px;
-      padding-bottom: 8px;
-      max-width: 100vw;
+    body {
+      font-family: "Microsoft JhengHei", Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #1a1a1a;
     }
-    .esri-basemap-gallery__item {
+
+    .header {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      min-height: 44px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      background: #1a1a1a;
+      border-bottom: 1px solid #333;
+    }
+
+    .home-link-wrap {
       min-width: 100px;
-      max-width: 160px;
+      max-width: 180px;
+      width: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      transition: background 0.2s;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      z-index: 2;
+    }
+    .home-link-wrap:hover {
+      background: #404040;
+    }
+    .home-link {
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      padding: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      cursor: pointer;
+      background: none;
+      transition: color 0.2s;
+    }
+    .home-link-wrap:hover .home-link {
+      color: #ffffff;
+    }
+
+    .header-title {
+      flex: 1;
+      color: #e0e0e0;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      background: transparent;
+    }
+
+    #viewDiv {
+      flex: 1;
+      min-height: 0;
+      background: #1a1a1a;
     }
   </style>
 </head>
 <body>
-<div id="viewDiv"></div>
-<script src="main.js"></script>
+  <div class="header">
+    <div class="home-link-wrap">
+      <a href="#" class="home-link">首頁</a>
+    </div>
+    <div class="header-title">湖口工作站3D視覺化輔助決策平台</div>
+  </div>
+  <div id="viewDiv"></div>
+  <script src="main.js"></script>
 </body>
 </html>

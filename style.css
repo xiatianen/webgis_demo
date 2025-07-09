@@ -1,0 +1,45 @@
+/* styles.css */
+html, body, #viewDiv {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.esri-layer-list__item-actions-menu {
+  display: none !important;
+}
+
+.esri-basemap-gallery {
+  max-width: 100% !important; /* 確保容器寬度適應內容 */
+  min-width: 180px !important;
+  width: auto !important;
+  padding: 8px !important; /* 添加內邊距 */
+}
+
+/* 橫向排列 BasemapGallery 項目 */
+.esri-basemap-gallery .esri-basemap-gallery__item-container {
+  display: flex !important;
+  flex-direction:  !important;
+  flex-wrap: nowrap !important; /* 單行排列 */
+  justify-content: flex-start !important; /* 從左開始 */
+  align-items: center !important; /* 垂直居中 */
+  overflow-x: auto !important; /* 允許水平滾動 */
+  gap: 10px !important; /* 項目間距 */
+  padding-bottom: 2px !important;
+}
+
+.esri-basemap-gallery .esri-basemap-gallery__item {
+  flex: 0 0 auto !important; /* 固定寬度，不拉伸 */
+  min-width: 100px !important;
+  max-width: 100px !important;
+  margin: 0 !important; /* 移除多餘外邊距 */
+}
+
+/* 確保滾動條美觀（可選） */
+.esri-basemap-gallery .esri-basemap-gallery__item-container::-webkit-scrollbar {
+  height: 8px;
+}
+.esri-basemap-gallery .esri-basemap-gallery__item-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}

@@ -10,11 +10,11 @@ define([
   FeatureLayer, GroupLayer, SimpleRenderer, SimpleLineSymbol, SimpleFillSymbol, SimpleMarkerSymbol
 ) {
 
-  // Helper: 河水堰復舊 點+面小組
+  // Helper: 河水堰復舊 點+面小組（修改為不可展開的群組）
   function createWeirSet(title, pointUrl, polygonUrl) {
     const pointLayer = new FeatureLayer({
       url: pointUrl,
-      title: title + " (點)",
+      title: title + "河水堰",
       visible: true,
       renderer: new SimpleRenderer({
         symbol: new SimpleMarkerSymbol({
@@ -28,94 +28,179 @@ define([
     });
     const polygonLayer = new FeatureLayer({
       url: polygonUrl,
-      title: title + " (水利小組)",
+      title: title + "連接水利小組",
       visible: true,
       renderer: new SimpleRenderer({
         symbol: new SimpleFillSymbol({
           color: [255,240,150,0.22],
-          outline: { color: [255,200,0,0.9], width: 2 }
+          outline: { color: [255,190,0,1], width: 2 }
         })
       }),
       popupTemplate: { title: "{名稱}", content: "面積：{Shape_Area}" }
     });
+    
+    // 返回一個不可展開的群組
     return new GroupLayer({
       title: title,
       visibilityMode: "inherited",
       visible: true,
       layers: [polygonLayer, pointLayer],
-      listMode: "show"
+      listMode: "hide-children" // 隱藏子圖層
     });
   }
 
-  // 河水堰復舊（主群組，預設不顯示）
-  const riverWeirRestorationGroup = new GroupLayer({
-    title: "河水堰復舊",
+  // 河水堰復舊（主群組，預設不顯示
+
+  const old_1 = new GroupLayer({
+    title: "員山溪1號",
     visible: false,
-    visibilityMode: "independent",
-    listMode: "show",
     layers: [
       createWeirSet(
-        "員山溪1號",
+        "",
         "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/42",
         "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/58"
-      ),
+      )]
+  })
+
+  const old_2 = new GroupLayer({
+    title: "大深坑溪2號",
+    visible: false,
+    layers: [
       createWeirSet(
-        "大深坑溪2號",
+        "",
         "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/41",
         "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/57"
-      ),
+      )]
+  })
+
+  const old_3 = new GroupLayer({
+    title: "大深坑溪3號",
+    visible: false,
+    layers: [
       createWeirSet(
-        "大深坑溪3號",
+        "",
         "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/40",
         "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/56"
-      ),
-      createWeirSet(
-        "大深坑溪4號",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/39",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/55"
-      ),
-      createWeirSet(
-        "德鴨溪9號",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/38",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/54"
-      ),
-      createWeirSet(
-        "荖溪2號",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/37",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/53"
-      ),
-      createWeirSet(
-        "荖溪3號",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/36",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/52"
-      ),
-      createWeirSet(
-        "德鴨溪8號",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/35",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/51"
-      ),
-      createWeirSet(
-        "德鴨溪7號",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/34",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/50"
-      ),
-      createWeirSet(
-        "北勢溪10號",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/33",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/49"
-      ),
-      createWeirSet(
-        "北勢溪9號",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/32",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/48"
-      ),
-      createWeirSet(
-        "牛鬥溪8號",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/31",
-        "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/47"
-      )
-    ]
-  });
+      )]
+  })  
+
+  const old_4 = new GroupLayer({
+  title: "大深坑溪4號",
+  visible: false,
+  layers: [
+    createWeirSet(
+      "",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/39",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/55"
+    )
+  ]
+});
+
+const old_5 = new GroupLayer({
+  title: "德鴨溪9號",
+  visible: false,
+  layers: [
+    createWeirSet(
+      "",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/38",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/54"
+    )
+  ]
+});
+
+const old_6 = new GroupLayer({
+  title: "荖溪2號",
+  visible: false,
+  layers: [
+    createWeirSet(
+      "",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/37",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/53"
+    )
+  ]
+});
+
+const old_7 = new GroupLayer({
+  title: "荖溪3號",
+  visible: false,
+  layers: [
+    createWeirSet(
+      "",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/36",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/52"
+    )
+  ]
+});
+
+const old_8 = new GroupLayer({
+  title: "德鴨溪8號",
+  visible: false,
+  layers: [
+    createWeirSet(
+      "",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/35",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/51"
+    )
+  ]
+});
+
+const old_9 = new GroupLayer({
+  title: "德鴨溪7號",
+  visible: false,
+  layers: [
+    createWeirSet(
+      "",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/34",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/50"
+    )
+  ]
+});
+
+const old_10 = new GroupLayer({
+  title: "北勢溪10號",
+  visible: false,
+  layers: [
+    createWeirSet(
+      "",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/33",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/49"
+    )
+  ]
+});
+
+const old_11 = new GroupLayer({
+  title: "北勢溪9號",
+  visible: false,
+  layers: [
+    createWeirSet(
+      "",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/32",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/48"
+    )
+  ]
+});
+
+const old_12 = new GroupLayer({
+  title: "牛鬥溪8號",
+  visible: false,
+  layers: [
+    createWeirSet(
+      "",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/31",
+      "https://gisportal.triwra.org.tw/server/rest/services/Hosted/river_weir_restoration/FeatureServer/47"
+    )
+  ]
+});
+
+const riverWeirRestorationGroup = new GroupLayer({
+  title: "河水堰復舊",
+  visible: false,
+  visibilityMode: "independent",
+  listMode: "show",
+  layers: [
+    old_1, old_2, old_3, old_4, old_5, old_6, old_7, old_8, old_9, old_10, old_11, old_12
+  ]
+});
 
   // 湖口工作站
   const hukou = new FeatureLayer({
@@ -178,10 +263,23 @@ define([
     renderer: new SimpleRenderer({
       symbol: new SimpleFillSymbol({
         color: [0, 200, 100, 0.3],
-        outline: { color: [0, 0, 0, 0.9], width: 1}
+        outline: { color: [0, 0, 0, 0.9], width: 2}
       })
     }),
-    popupTemplate: { title: "{名稱}", content: "面積：{Shape_Area}" }
+    labelingInfo: [{
+      labelExpressionInfo: { expression: "$feature.水利小組名稱" },
+      symbol: {
+        type: "text",
+        color: "black",
+        haloColor: "white",
+        haloSize: "1.5px",
+        font: {
+          size: 20,
+          weight: "normal"
+        }
+      },
+      labelPlacement: "always-horizontal"
+    }]
   });
   const landuseGroup = new GroupLayer({
     title: "土地利用",
@@ -193,15 +291,15 @@ define([
   // 堤塘_有高程
   const ponds = new FeatureLayer({
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/ponds/FeatureServer",
-    title: "堤塘",
+    title: "埤塘",
     visible: false,
     renderer: new SimpleRenderer({
       symbol: new SimpleFillSymbol({
-        color: [180,180,180,0.28],
-        outline: { color: [120,120,120,0.9], width: 2 }
+        color: [0,120,200,0.3],
+        outline: { color: [120,120,120,0.9], width: 0 }
       })
     }),
-    popupTemplate: { title: "{名稱}", content: "面積：{Shape_Area}" }
+    popupTemplate: { title: "{OBJECTID}", content: "高程 (m)：{高程}" }
   });
 
   // ====== 新增【圳路群組】======
@@ -209,9 +307,16 @@ define([
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/canal/FeatureServer/4",
     title: "幹線",
     visible: true,
+    definitionExpression: "OBJECTID NOT IN (8, 3, 2)",
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
-        color: [0, 180, 255, 0.85], width: 3, style: "solid"
+        color: [230, 0, 0, 0.85],
+        width: 10,
+        style: "solid",
+        marker: {
+          style: "arrow",
+          placement: "end"
+        }
       })
     }),
     popupTemplate: { title: "{名稱}", content: "OID：{OBJECTID}" }
@@ -222,7 +327,13 @@ define([
     visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
-        color: [0, 140, 100, 0.85], width: 2.4, style: "solid"
+        color: [230, 0, 0, 0.85],
+        width: 7,
+        style: "solid",
+        marker: {
+          style: "arrow",
+          placement: "end"
+        }
       })
     }),
     popupTemplate: { title: "{名稱}", content: "OID：{OBJECTID}" }
@@ -233,7 +344,13 @@ define([
     visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
-        color: [130, 80, 220, 0.85], width: 2, style: "solid"
+        color: [230, 0, 0, 0.85],
+        width: 4,
+        style: "solid",
+        marker: {
+          style: "arrow",
+          placement: "end"
+        }
       })
     }),
     popupTemplate: { title: "{名稱}", content: "OID：{OBJECTID}" }
@@ -244,7 +361,13 @@ define([
     visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
-        color: [230, 80, 80, 0.85], width: 2, style: "dash"
+        color: [230, 0, 0, 0.85],
+        width: 2,
+        style: "solid",
+        marker: {
+          style: "arrow",
+          placement: "end"
+        }
       })
     }),
     popupTemplate: { title: "{名稱}", content: "OID：{OBJECTID}" }
@@ -274,8 +397,9 @@ define([
     title: "河道",
     visible: true,
     renderer: new SimpleRenderer({
-      symbol: new SimpleLineSymbol({
-        color: [0,120,200,1], width: 2, style: "solid"
+      symbol: new SimpleFillSymbol({
+        color: [0,120,200,1],
+        outline: { color: [0,120,200,1], width: 2 }
       })
     }),
     popupTemplate: { title: "{名稱}", content: "OID：{OBJECTID}" }
@@ -286,7 +410,7 @@ define([
     visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
-        color: [50,150,80,1], width: 1.5, style: "dot"
+        color: [0,120,200,1], width: 2, style: "solid"
       })
     }),
     popupTemplate: { title: "{名稱}", content: "OID：{OBJECTID}" }
@@ -297,7 +421,10 @@ define([
     visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
-        color: [150,80,0,1], width: 1, style: "dash"
+        color: [0,120,200,1], 
+        width: 1.5, 
+        style: "dot",
+        dotPattern: [1, 5]  // 5 points dash, 5 points gap
       })
     }),
     popupTemplate: { title: "{名稱}", content: "OID：{OBJECTID}" }
