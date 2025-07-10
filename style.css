@@ -56,6 +56,7 @@ html, body, #viewDiv {
   display: flex;
   flex-direction: column;
   box-shadow: -5px 0 15px rgba(0, 0, 0, 0.15);
+  opacity: 0.95;
 }
 
 .panel-header {
@@ -305,7 +306,7 @@ input[type="range"].opacity-slider { /* 給予 slider 一個 class 以便選取 
 /* 圖例 */
 
 .esri-legend {
-  opacity: 0.975 !important;
+  opacity: 0.95 !important;
 }
 
 /* Zoom */

@@ -77,7 +77,7 @@ require([
 
   // 建立地圖
   const map = new Map({
-    basemap: "osm",
+    basemap: "gray",
     ground: ground,
     layers: [
       buildingLayerGroup, layers.hukou, layers.contours, layers.landuseGroup, layers.canalGroup,
@@ -102,7 +102,7 @@ require([
     environment: {
       background: {
         type: "color",  // 這句一定要有！
-        color: [0, 0, 0, 1] // 這裡設成全白，想換灰色就改RGB
+        color: [25, 25, 25, 1] // 這裡設成全白，想換灰色就改RGB
       },
       starsEnabled: false,    // 不顯示星星
       atmosphereEnabled: false // 不顯示大氣
