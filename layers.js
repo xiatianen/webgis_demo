@@ -17,14 +17,66 @@ define([
       title: title + "河水堰",
       visible: true,
       renderer: new SimpleRenderer({
-        symbol: new SimpleMarkerSymbol({
-          style: "diamond",
-          size: 14,
-          color: [180,0,255,0.8],
-          outline: { color: [80,0,200,0.9], width: 2 }
-        })
+      symbol: new SimpleMarkerSymbol({
+        style: "diamond",
+        size: 14,
+        color: [180,0,255,0.8],
+        outline: { color: [80,0,200,0.9], width: 2 }
       }),
-      popupTemplate: { title: "{名稱}", content: "OID：{OBJECTID}" }
+      }),
+      popupTemplate: { 
+      title: "{河水堰}", 
+      content: [{
+        type: "fields",
+        fieldInfos: [
+        { fieldName: "所屬圳路", label: "所屬圳路" },
+        { fieldName: "所屬圳路連接小組_1", label: "連接小組-1" },
+        { fieldName: "所屬圳路連接小組_2", label: "連接小組-2" },
+        { fieldName: "所屬圳路連接小組_3", label: "連接小組-3" },
+        { fieldName: "所屬圳路連接小組_4", label: "連接小組-4" },
+        { fieldName: "連接小組總面積", label: "連接小組總面積 (公頃)" }
+        ]
+      }]
+      },
+
+      // --- 從這裡開始加入標籤設定 ---
+      labelingInfo: [{
+      labelExpressionInfo: {
+        // 設定要顯示為標籤的欄位，這裡我們用 "名稱" 欄位
+        expression: "$feature.河水堰" 
+      },
+      // 為了在 3D 場景中有最好的效果，建議使用 LabelSymbol3D
+      symbol: {
+        type: "label-3d", // 指定 Symbol 類型為 3D 標籤
+        symbolLayers: [{
+        type: "text", // 內層是文字圖層
+        material: {
+          color: "black" // 文字顏色
+        },
+        halo: { // 加上黑色光暈 (描邊)，讓白色文字更清晰
+          color: "white",
+          size: 2
+        },
+        font: {
+          // 關鍵：在這裡設定文字大小，您可以依需求調整數字
+          size: 20, 
+          weight: "bold",
+          family: "Microsoft JhengHei" // 建議指定一個支援中文的字體
+        }
+        }],
+        // 加上引導線，避免文字直接蓋在圖示上
+        callout: {
+        type: "line",
+        size: 1,
+        color: [50, 50, 50],
+        border: {
+          color: [255, 255, 255, 0.7]
+        }
+        }
+      }
+      }]
+      // --- 標籤設定結束 ---
+    
     });
     const polygonLayer = new FeatureLayer({
       url: polygonUrl,
@@ -33,7 +85,7 @@ define([
       renderer: new SimpleRenderer({
         symbol: new SimpleFillSymbol({
           color: [255,240,150,0.22],
-          outline: { color: [255,190,0,1], width: 2 }
+          outline: { color: [240,170,0,1], width: 2 }
         })
       }),
       popupTemplate: { title: "{名稱}", content: "面積：{Shape_Area}" }
@@ -274,7 +326,7 @@ const riverWeirRestorationGroup = new GroupLayer({
         haloColor: "white",
         haloSize: "1.5px",
         font: {
-          size: 20,
+          size: 14,
           weight: "normal"
         }
       },
@@ -288,7 +340,7 @@ const riverWeirRestorationGroup = new GroupLayer({
     layers: [landuse_group, landuse_water, landuse_owner]
   });
 
-  // 堤塘_有高程
+  // 埤塘_有高程
   const ponds = new FeatureLayer({
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/ponds/FeatureServer",
     title: "埤塘",
@@ -311,11 +363,11 @@ const riverWeirRestorationGroup = new GroupLayer({
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
         color: [230, 0, 0, 0.85],
-        width: 10,
+        width: 6,
         style: "solid",
         marker: {
           style: "arrow",
-          placement: "end"
+          placement: "end",
         }
       })
     }),
@@ -328,7 +380,7 @@ const riverWeirRestorationGroup = new GroupLayer({
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
         color: [230, 0, 0, 0.85],
-        width: 7,
+        width: 4,
         style: "solid",
         marker: {
           style: "arrow",
@@ -345,7 +397,7 @@ const riverWeirRestorationGroup = new GroupLayer({
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
         color: [230, 0, 0, 0.85],
-        width: 4,
+        width: 2,
         style: "solid",
         marker: {
           style: "arrow",
@@ -362,7 +414,7 @@ const riverWeirRestorationGroup = new GroupLayer({
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
         color: [230, 0, 0, 0.85],
-        width: 2,
+        width: 1,
         style: "solid",
         marker: {
           style: "arrow",
@@ -378,7 +430,7 @@ const riverWeirRestorationGroup = new GroupLayer({
     visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
-        color: [0, 0, 0, 0.85], width: 1.6, style: "dot"
+        color: [0, 0, 0, 0.85], width: 1, style: "dot"
       })
     }),
     popupTemplate: { title: "{名稱}", content: "OID：{OBJECTID}" }
@@ -439,13 +491,13 @@ const riverWeirRestorationGroup = new GroupLayer({
   // 使用中河水堰群組
   const activeWeir_owner = new FeatureLayer({
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/active_river_weirs/FeatureServer/1",
-    title: "有水權",
+    title: "使用中 (有水權)",
     visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleMarkerSymbol({
         style: "circle",
         color: [50,200,255,0.85],
-        size: 9,
+        size: 15,
         outline: { color: [0,100,200,1], width: 2 }
       })
     }),
@@ -457,10 +509,10 @@ const riverWeirRestorationGroup = new GroupLayer({
     visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleMarkerSymbol({
-        style: "cross",
-        color: [255,200,50,0.85],
-        size: 11,
-        outline: { color: [120,80,0,1], width: 2 }
+        style: "circle",
+        color: [255,255,255,0.85],
+        size: 15,
+        outline: { color: [0,0,0,1], width: 2 }
       })
     }),
     popupTemplate: { title: "{名稱}", content: "OID：{OBJECTID}" }
@@ -469,7 +521,7 @@ const riverWeirRestorationGroup = new GroupLayer({
     title: "使用中河水堰",
     visibilityMode: "independent",
     visible: false,
-    layers: [activeWeir_owner, activeWeir_active]
+    layers: [activeWeir_active, activeWeir_owner]
   });
 
   // 等高線
@@ -505,8 +557,8 @@ const riverWeirRestorationGroup = new GroupLayer({
     river_branch,
     river_drain,
     riverGroup,
-    activeWeir_owner,
     activeWeir_active,
+    activeWeir_owner,
     activeWeirGroup,
     contours
   };

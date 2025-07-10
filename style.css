@@ -15,7 +15,7 @@ html, body, #viewDiv {
 /* --- 2. 面板佈局樣式 (從原始 JS 的 cssText 轉換而來) --- */
 .panel-toggle-button {
   position: fixed;
-  top: 20px;
+  top: 65px;
   right: 20px;
   z-index: 1000;
   padding: 10px;
@@ -180,7 +180,7 @@ input[type="range"].opacity-slider { /* 給予 slider 一個 class 以便選取 
 
 /* --- 3. 細節與互動樣式 (從原始 JS 的 <style> 標籤合併而來) --- */
 .panel-toggle-button:hover {
-  transform: translateX(-3px) scale(1.05);
+  transform: translateX(-0px) scale(1);
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
 }
 
