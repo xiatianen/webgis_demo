@@ -1,4 +1,4 @@
-// main.js (已移除所有 CSS 的版本)
+// main.js (完整程式碼，無任何省略)
 require([
   "esri/config",
   "esri/Map",
@@ -45,34 +45,37 @@ require([
     visible: true
   });
 
-  // 1. 建立誇張版 Elevation Layer
+  // 建立誇張版 Elevation Layer 子類別
   const ExaggeratedElevationLayer = ElevationLayer.createSubclass({
     properties: {
-      exaggeration: 10
+      exaggeration: 1.0
     },
     initialize: function() {
       this._elevation = new ElevationLayer({ url: this.url });
     },
     fetchTile: function(level, row, col, options) {
-      // 用 this._elevation（不是 _originalElevation）
       return this._elevation.fetchTile(level, row, col, options).then(data => {
+        const exaggeration = this.exaggeration;
         for (let i = 0; i < data.values.length; i++) {
-          data.values[i] = data.values[i] * this.exaggeration;
+          data.values[i] = data.values[i] * exaggeration;
         }
         return data;
       });
     }
   });
 
-  // 2. 實體化一個高程來源
-  const elevationLayer = new ExaggeratedElevationLayer({
+  // 初始地形誇張倍率
+  const initialExaggeration = 10;
+
+  // 建立初始的地形圖層
+  const initialElevationLayer = new ExaggeratedElevationLayer({
     url: "https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer",
-    exaggeration: 10 // 改你要的倍率
+    exaggeration: initialExaggeration
   });
 
-  // 3. ground 設為這個 elevationLayer
+  // 將地形圖層設定到 Ground
   const ground = new Ground({
-    layers: [elevationLayer]
+    layers: [initialElevationLayer]
   });
 
   // 建立地圖
@@ -98,16 +101,32 @@ require([
       position: { longitude: 121.05, latitude: 24.9, z: 3500 },
       tilt: 65
     },
-    // 這一段就是重點
     environment: {
       background: {
-        type: "color",  // 這句一定要有！
-        color: [25, 25, 25, 1] // 這裡設成全白，想換灰色就改RGB
+        type: "color",
+        color: [25, 25, 25, 1]
       },
-      starsEnabled: false,    // 不顯示星星
-      atmosphereEnabled: false // 不顯示大氣
+      starsEnabled: false,
+      atmosphereEnabled: false
     }
   });
+
+  // 載入訊息的輔助函式
+  let loadingNode = null;
+  function showLoadingMessage(message) {
+    if (loadingNode) { return; }
+    loadingNode = document.createElement('div');
+    loadingNode.innerText = message;
+    loadingNode.style = "position:fixed;top:16px;left:50%;transform:translateX(-50%);background:rgba(30,30,30,0.8);color:white;padding:10px 25px;border-radius:8px;z-index:10000;font-size:15px;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.3);";
+    document.body.appendChild(loadingNode);
+  }
+
+  function hideLoadingMessage() {
+    if (loadingNode) {
+      loadingNode.remove();
+      loadingNode = null;
+    }
+  }
 
   // 異步載入建物圖層
   async function addAvailableBuildings() {
@@ -131,7 +150,6 @@ require([
   function showLayerError(msg) {
     const node = document.createElement('div');
     node.innerText = msg;
-    // 這些樣式因為是動態錯誤訊息，保留在 JS 中是合理的
     node.style = "position:fixed;top:16px;right:16px;background:#ffefef;color:#aa2222;padding:8px 20px;border-radius:8px;z-index:9999;font-size:14px;";
     document.body.appendChild(node);
     setTimeout(() => { node.remove(); }, 4000);
@@ -139,16 +157,13 @@ require([
 
   // 建立右側面板
   function createRightSidePanel() {
-    // 觸發按鈕
     const toggleButton = document.createElement("button");
     toggleButton.className = "esri-widget esri-component panel-toggle-button";
     toggleButton.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>`;
 
-    // 右側面板
     const sidePanel = document.createElement("div");
     sidePanel.className = "esri-widget esri-component right-side-panel";
 
-    // 面板標題
     const panelHeader = document.createElement("div");
     panelHeader.className = "panel-header";
     const panelTitle = document.createElement("h2");
@@ -157,12 +172,10 @@ require([
     closeButton.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
     panelHeader.appendChild(panelTitle);
     panelHeader.appendChild(closeButton);
-
-    // 面板內容
+    
     const panelContent = document.createElement("div");
     panelContent.className = "panel-content";
 
-    // 圖層列表區塊
     const layerSection = document.createElement("div");
     layerSection.className = "layer-section";
     const layerTitle = document.createElement("h3");
@@ -172,60 +185,82 @@ require([
     layerSection.appendChild(layerTitle);
     layerSection.appendChild(layerListContainer);
 
-    // 底圖區塊
     const basemapSection = document.createElement("div");
     basemapSection.className = "basemap-section";
     const basemapTitle = document.createElement("h3");
-    basemapTitle.textContent = "底圖控制";
+    basemapTitle.textContent = "底圖與地形控制";
     const basemapContainer = document.createElement("div");
     basemapContainer.className = "basemap-selector";
     basemapSection.appendChild(basemapTitle);
     basemapSection.appendChild(basemapContainer);
 
-    // 透明度控制區塊
     const opacityContainer = document.createElement("div");
     opacityContainer.className = "opacity-control";
     const opacityLabel = document.createElement("label");
     opacityLabel.textContent = "底圖透明度";
     const sliderContainer = document.createElement("div");
     sliderContainer.className = "slider-container";
-    const slider = document.createElement("input");
-    slider.type = "range";
-    slider.min = "0";
-    slider.max = "100";
-    slider.value = "100";
-    slider.className = "opacity-slider"; // 使用 class
+    const basemapSlider = document.createElement("input");
+    basemapSlider.type = "range";
+    basemapSlider.min = "0";
+    basemapSlider.max = "100";
+    basemapSlider.value = "100";
+    basemapSlider.className = "opacity-slider";
     const valueDisplay = document.createElement("span");
     valueDisplay.className = "slider-value";
     valueDisplay.textContent = "100%";
-    sliderContainer.appendChild(slider);
+    sliderContainer.appendChild(basemapSlider);
     sliderContainer.appendChild(valueDisplay);
     opacityContainer.appendChild(opacityLabel);
     opacityContainer.appendChild(sliderContainer);
     basemapSection.appendChild(opacityContainer);
 
-    // 組裝所有元素
+    const terrainControlContainer = document.createElement("div");
+    terrainControlContainer.className = "opacity-control";
+    const terrainLabel = document.createElement("label");
+    terrainLabel.textContent = "地形誇張";
+    const terrainSliderContainer = document.createElement("div");
+    terrainSliderContainer.className = "slider-container";
+    
+    const terrainSlider = document.createElement("input");
+    terrainSlider.type = "range";
+    terrainSlider.min = "1";
+    terrainSlider.max = "50";
+    terrainSlider.value = initialExaggeration.toString();
+    terrainSlider.step = "0.5";
+    terrainSlider.className = "opacity-slider";
+    
+    const terrainValueDisplay = document.createElement("span");
+    terrainValueDisplay.className = "slider-value";
+    terrainValueDisplay.textContent = `${initialExaggeration}x`;
+    
+    terrainSliderContainer.appendChild(terrainSlider);
+    terrainSliderContainer.appendChild(terrainValueDisplay);
+    terrainControlContainer.appendChild(terrainLabel);
+    terrainControlContainer.appendChild(terrainSliderContainer);
+    basemapSection.appendChild(terrainControlContainer);
+    
     panelContent.appendChild(layerSection);
     panelContent.appendChild(basemapSection);
     sidePanel.appendChild(panelHeader);
     sidePanel.appendChild(panelContent);
 
-    // 添加到頁面
     document.body.appendChild(toggleButton);
     document.body.appendChild(sidePanel);
-
-    // --- 事件處理 ---
-    slider.addEventListener("input", function() {
+    
+    basemapSlider.addEventListener("input", function() {
       const opacity = parseFloat(this.value) / 100;
       valueDisplay.textContent = this.value + "%";
-      // 更新滑桿背景漸變
       this.style.background = `linear-gradient(to right, #3b82f6 ${this.value}%, #e5e7eb ${this.value}%)`;
       if (map.basemap?.baseLayers.length > 0) {
         map.basemap.baseLayers.forEach(layer => { layer.opacity = opacity; });
       }
     });
+    
+    basemapSlider.style.background = `linear-gradient(to right, #3b82f6 100%, #e5e7eb 100%)`;
+    const terrainPercentage = ((initialExaggeration - terrainSlider.min) / (terrainSlider.max - terrainSlider.min)) * 100;
+    terrainSlider.style.background = `linear-gradient(to right, #3b82f6 ${terrainPercentage}%, #e5e7eb ${terrainPercentage}%)`;
 
-    // 面板開關邏輯
     let isPanelOpen = false;
     const togglePanel = () => {
       isPanelOpen = !isPanelOpen;
@@ -240,19 +275,44 @@ require([
 
     toggleButton.addEventListener("click", togglePanel);
     closeButton.addEventListener("click", togglePanel);
-
-    return { layerListContainer, basemapContainer, slider };
+    
+    return { layerListContainer, basemapContainer, basemapSlider, terrainSlider, terrainValueDisplay };
   }
 
   // ---------- UI組件註冊 ----------
   view.when(() => {
-
     addAvailableBuildings();
-
-    // 建立右側面板
     const rightPanel = createRightSidePanel();
 
-    // 圖層列表
+    let terrainUpdateTimeout;
+
+    rightPanel.terrainSlider.addEventListener("input", function() {
+        const exaggerationValue = parseFloat(this.value);
+        rightPanel.terrainValueDisplay.textContent = `${exaggerationValue.toFixed(1)}x`;
+        const percentage = ((exaggerationValue - this.min) / (this.max - this.min)) * 100;
+        this.style.background = `linear-gradient(to right, #3b82f6 ${percentage}%, #e5e7eb ${percentage}%)`;
+
+        clearTimeout(terrainUpdateTimeout);
+        terrainUpdateTimeout = setTimeout(() => {
+            showLoadingMessage("地形調整中，請稍後...");
+
+            const newElevationLayer = new ExaggeratedElevationLayer({
+                url: "https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer",
+                exaggeration: exaggerationValue
+            });
+            
+            map.ground.layers.removeAll();
+            map.ground.layers.add(newElevationLayer);
+
+            const watcher = view.watch("updating", (isUpdating) => {
+                if (isUpdating === false) {
+                    hideLoadingMessage();
+                    watcher.remove();
+                }
+            });
+        }, 400);
+    });
+
     new LayerList({
       view,
       container: rightPanel.layerListContainer,
@@ -266,37 +326,31 @@ require([
         if (title === "建物圖層" || title.includes("溪")) {
           item.open = false;
           if (title.includes("溪")) {
-             item.canToggle = false;
+            item.canToggle = false;
           }
         }
       }
     });
-
-    // 底圖控制
+    
     new BasemapGallery({
       view,
       container: rightPanel.basemapContainer,
       source: [Basemap.fromId("osm"), Basemap.fromId("satellite"), Basemap.fromId("gray")]
     });
-
-    // 保留圖例在左下角
-    // 只顯示非「建物圖層」的圖例
+    
     const legend = new Legend({
       view,
       layerInfos: map.layers
-      .filter(layer => layer.title !== "建物圖層")
-      .map(layer => ({ layer }))
+        .filter(layer => layer.title !== "建物圖層")
+        .map(layer => ({ layer }))
     });
     view.ui.add(legend, "bottom-left");
-
-    // 底圖變更時保持透明度
+    
     map.watch("basemap", (newBasemap) => {
-      const currentOpacity = parseFloat(rightPanel.slider.value) / 100;
+      const currentOpacity = parseFloat(rightPanel.basemapSlider.value) / 100;
       if (newBasemap?.baseLayers.length > 0) {
         newBasemap.baseLayers.forEach(layer => { layer.opacity = currentOpacity; });
       }
     });
-    
-    // 不再需要動態注入 <style> 標籤
   });
 });
