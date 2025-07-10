@@ -527,13 +527,114 @@ const riverWeirRestorationGroup = new GroupLayer({
   // 等高線
   const contours = new FeatureLayer({
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/contours_10m/FeatureServer",
-    title: "等高線 (10公尺)",
+    title: "等高線 (10公尺間距)",
     visible: false,
-    renderer: new SimpleRenderer({
-      symbol: new SimpleLineSymbol({
-        color: [120,120,200,1], width: 1, style: "dash"
-      })
-    }),
+    renderer: {
+      type: "unique-value",
+      field: "Contour",
+      uniqueValueInfos: [
+        {
+          value: 0,
+          symbol: {
+            type: "simple-line",
+            color: [0, 0, 255, 1],
+            width: 2,
+            style: "solid"
+          },
+          label: "0"
+        },
+        {
+          value: 10,
+          symbol: {
+            type: "simple-line",
+            color: [0, 128, 255, 1],
+            width: 2,
+            style: "solid"
+          },
+          label: "10"
+        },
+        {
+          value: 20,
+          symbol: {
+            type: "simple-line",
+            color: [0, 200, 200, 1],
+            width: 2,
+            style: "solid"
+          },
+          label: "20"
+        },
+        {
+          value: 30,
+          symbol: {
+            type: "simple-line",
+            color: [0, 200, 100, 1],
+            width: 2,
+            style: "solid"
+          },
+          label: "30"
+        },
+        {
+          value: 40,
+          symbol: {
+            type: "simple-line",
+            color: [0, 200, 0, 1],
+            width: 2,
+            style: "solid"
+          },
+          label: "40"
+        },
+        {
+          value: 50,
+          symbol: {
+            type: "simple-line",
+            color: [128, 200, 0, 1],
+            width: 2,
+            style: "solid"
+          },
+          label: "50"
+        },
+        {
+          value: 60,
+          symbol: {
+            type: "simple-line",
+            color: [200, 200, 0, 1],
+            width: 2,
+            style: "solid"
+          },
+          label: "60"
+        },
+        {
+          value: 70,
+          symbol: {
+            type: "simple-line",
+            color: [255, 170, 0, 1],
+            width: 2,
+            style: "solid"
+          },
+          label: "70"
+        },
+        {
+          value: 80,
+          symbol: {
+            type: "simple-line",
+            color: [255, 85, 0, 1],
+            width: 2,
+            style: "solid"
+          },
+          label: "80"
+        },
+        {
+          value: 90,
+          symbol: {
+            type: "simple-line",
+            color: [255, 0, 0, 1],
+            width: 2,
+            style: "solid"
+          },
+          label: "90"
+        }
+      ]
+    },
     popupTemplate: { title: "{名稱}", content: "OID：{OBJECTID}" }
   });
 

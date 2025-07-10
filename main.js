@@ -13,10 +13,12 @@ require([
   "esri/renderers/SimpleRenderer",
   "esri/symbols/MeshSymbol3D",
   "esri/symbols/FillSymbol3DLayer",
-  "./layers.js"
+  "./layers.js",
+  "esri/layers/ElevationLayer",
+  "esri/Ground"
 ], function(
   esriConfig, Map, SceneView, LayerList, Legend, BasemapGallery, Basemap, Extent, SceneLayer, GroupLayer,
-  SimpleRenderer, MeshSymbol3D, FillSymbol3DLayer, layers
+  SimpleRenderer, MeshSymbol3D, FillSymbol3DLayer, layers, ElevationLayer, Ground
 ) {
   // CORS 設定
   if (esriConfig.request?.corsEnabledServers?.add) {
@@ -43,10 +45,40 @@ require([
     visible: true
   });
 
+  // 1. 建立誇張版 Elevation Layer
+  const ExaggeratedElevationLayer = ElevationLayer.createSubclass({
+    properties: {
+      exaggeration: 10
+    },
+    initialize: function() {
+      this._elevation = new ElevationLayer({ url: this.url });
+    },
+    fetchTile: function(level, row, col, options) {
+      // 用 this._elevation（不是 _originalElevation）
+      return this._elevation.fetchTile(level, row, col, options).then(data => {
+        for (let i = 0; i < data.values.length; i++) {
+          data.values[i] = data.values[i] * this.exaggeration;
+        }
+        return data;
+      });
+    }
+  });
+
+  // 2. 實體化一個高程來源
+  const elevationLayer = new ExaggeratedElevationLayer({
+    url: "https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer",
+    exaggeration: 10 // 改你要的倍率
+  });
+
+  // 3. ground 設為這個 elevationLayer
+  const ground = new Ground({
+    layers: [elevationLayer]
+  });
+
   // 建立地圖
   const map = new Map({
     basemap: "osm",
-    ground: "world-elevation",
+    ground: ground,
     layers: [
       buildingLayerGroup, layers.hukou, layers.contours, layers.landuseGroup, layers.canalGroup,
       layers.riverGroup, layers.ponds, layers.activeWeirGroup, layers.riverWeirRestorationGroup
@@ -214,6 +246,7 @@ require([
 
   // ---------- UI組件註冊 ----------
   view.when(() => {
+
     addAvailableBuildings();
 
     // 建立右側面板
