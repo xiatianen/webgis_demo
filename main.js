@@ -1,4 +1,4 @@
-// main.js (完整程式碼，無任何省略)
+// main.js (已將動畫工具改為 Icon 展開模式)
 require([
   "esri/config",
   "esri/Map",
@@ -149,13 +149,13 @@ require([
     }
   }
 
-  // 顯示失敗訊息
-  function showLayerError(msg) {
+  // 顯示提示訊息
+  function showLayerError(msg, duration = 2000) {
     const node = document.createElement('div');
     node.innerText = msg;
-    node.style = "position:fixed;top:16px;right:16px;background:#ffefef;color:#aa2222;padding:8px 20px;border-radius:8px;z-index:9999;font-size:14px;";
+    node.style = "position:fixed;top:16px;right:16px;background:#e6f4ff;color:#0062cc;padding:8px 20px;border-radius:8px;z-index:9999;font-size:14px;border: 1px solid #b3d7ff;";
     document.body.appendChild(node);
-    setTimeout(() => { node.remove(); }, 4000);
+    setTimeout(() => { node.remove(); }, duration);
   }
 
   // 建立右側面板
@@ -284,174 +284,219 @@ require([
 
   // 建立測量工具
   function createMeasurementTools() {
-    // 建立距離測量工具
-    const distanceMeasurement = new DirectLineMeasurement3D({
-      view: view
-    });
-
-    // 建立面積測量工具
-    const areaMeasurement = new AreaMeasurement3D({
-      view: view
-    });
-
-    // 建立測量工具容器
+    const distanceMeasurement = new DirectLineMeasurement3D({ view: view });
+    const areaMeasurement = new AreaMeasurement3D({ view: view });
     const measurementContainer = document.createElement("div");
     measurementContainer.className = "measurement-tools";
-    measurementContainer.style.cssText = `
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    `;
-
-    // 建立測量面板
+    measurementContainer.style.cssText = `display: flex; flex-direction: column; gap: 4px;`;
     const measurementPanel = document.createElement("div");
     measurementPanel.className = "esri-widget esri-component";
-    measurementPanel.style.cssText = `
-      display: none;
-      flex-direction: column;
-      gap: 8px;
-      padding: 12px;
-      background: rgba(225, 225, 225, 0.95);
-      border-radius: 4px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-      min-width: 150px;
-    `;
-
-    // 建立距離測量按鈕
+    measurementPanel.style.cssText = `display: none; flex-direction: column; gap: 8px; padding: 12px; background: rgba(225, 225, 225, 0.95); border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); min-width: 150px;`;
     const distanceButton = document.createElement("button");
     distanceButton.textContent = "距離測量";
-    distanceButton.style.cssText = `
-      padding: 8px 12px;
-      background:rgba(255, 255, 255, 0.95);
-      color: black;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    `;
-
-    // 建立面積測量按鈕
+    distanceButton.style.cssText = `padding: 8px 12px; background:rgba(255, 255, 255, 0.95); color: black; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;`;
     const areaButton = document.createElement("button");
     areaButton.textContent = "面積測量";
-    areaButton.style.cssText = `
-      padding: 8px 12px;
-      background:rgba(255, 255, 255, 0.95);
-      color: black;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    `;
-
-    // 建立清除按鈕
+    areaButton.style.cssText = `padding: 8px 12px; background:rgba(255, 255, 255, 0.95); color: black; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;`;
     const clearButton = document.createElement("button");
     clearButton.textContent = "清除測量";
-    clearButton.style.cssText = `
-      padding: 8px 12px;
-      background:rgba(255, 255, 255, 0.95);
-      color: black;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    `;
-
+    clearButton.style.cssText = `padding: 8px 12px; background:rgba(255, 255, 255, 0.95); color: black; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;`;
     measurementPanel.appendChild(distanceButton);
     measurementPanel.appendChild(areaButton);
     measurementPanel.appendChild(clearButton);
-
-    // 建立主測量按鈕
     const measurementToggle = document.createElement("button");
     measurementToggle.className = "esri-widget esri-component";
-    measurementToggle.innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M3 3l18 18"/>
-        <path d="M21 3L3 21"/>
-        <circle cx="9" cy="9" r="2"/>
-        <circle cx="15" cy="15" r="2"/>
-      </svg>
-    `;
+    measurementToggle.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l18 18"/><path d="M21 3L3 21"/><circle cx="9" cy="9" r="2"/><circle cx="15" cy="15" r="2"/></svg>`;
     measurementToggle.title = "測量工具";
-    measurementToggle.style.cssText = `
-      width: 32px;
-      height: 32px;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      border: none;
-      background: rgba(255, 255, 255, 0.95);
-      color: #374151;
-      border-radius: 4px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    `;
-
+    measurementToggle.style.cssText = `width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; background: rgba(255, 255, 255, 0.95); color: #374151; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);`;
     measurementContainer.appendChild(measurementToggle);
     measurementContainer.appendChild(measurementPanel);
-
     let activeWidget = null;
     let isPanelOpen = false;
-
-    // 主按鈕切換面板
     measurementToggle.addEventListener("click", () => {
       isPanelOpen = !isPanelOpen;
       measurementPanel.style.display = isPanelOpen ? "flex" : "none";
       measurementToggle.style.background = isPanelOpen ? "#397CEA" : "rgba(255, 255, 255, 0.95)";
       measurementToggle.style.color = isPanelOpen ? "white" : "#374151";
     });
-
-    // 距離測量按鈕事件
+    const closeMeasurementPanel = () => {
+      isPanelOpen = false;
+      measurementPanel.style.display = "none";
+      measurementToggle.style.background = "rgba(255, 255, 255, 0.95)";
+      measurementToggle.style.color = "#374151";
+    };
     distanceButton.addEventListener("click", () => {
-      if (activeWidget) {
-        activeWidget.viewModel.clear();
-      }
+      if (activeWidget) activeWidget.viewModel.clear();
       activeWidget = distanceMeasurement;
       distanceMeasurement.viewModel.start();
-      isPanelOpen = false;
-      measurementPanel.style.display = "none";
-      measurementToggle.style.background = "rgba(255, 255, 255, 0.95)";
-      measurementToggle.style.color = "#374151";
+      closeMeasurementPanel();
     });
-
-    // 面積測量按鈕事件
     areaButton.addEventListener("click", () => {
-      if (activeWidget) {
-        activeWidget.viewModel.clear();
-      }
+      if (activeWidget) activeWidget.viewModel.clear();
       activeWidget = areaMeasurement;
       areaMeasurement.viewModel.start();
-      isPanelOpen = false;
-      measurementPanel.style.display = "none";
-      measurementToggle.style.background = "rgba(255, 255, 255, 0.95)";
-      measurementToggle.style.color = "#374151";
+      closeMeasurementPanel();
     });
-
-    // 清除按鈕事件
     clearButton.addEventListener("click", () => {
       distanceMeasurement.viewModel.clear();
       areaMeasurement.viewModel.clear();
       activeWidget = null;
-      isPanelOpen = false;
-      measurementPanel.style.display = "none";
-      measurementToggle.style.background = "rgba(255, 255, 255, 0.95)";
-      measurementToggle.style.color = "#374151";
+      closeMeasurementPanel();
+    });
+    return measurementContainer;
+  }
+  
+  // ---------- 全新：重構後的互動式動畫功能 ----------
+  function createInteractiveAnimationTools() {
+    // --- 狀態管理變數 ---
+    let isRecording = false;
+    let customWaypoints = [];
+    let isAnimationPanelOpen = false;
+
+    // --- 建立 UI 元素 (仿照測量工具的結構) ---
+    // 1. 建立主容器
+    const animationToolsContainer = document.createElement("div");
+    animationToolsContainer.className = "animation-tools";
+    animationToolsContainer.style.cssText = "display: flex; flex-direction: column; gap: -4px; margin-top: -9px;";
+
+    // 2. 建立主圖示 (切換按鈕)
+    const animationToggle = document.createElement("button");
+    animationToggle.className = "esri-widget esri-component";
+    animationToggle.title = "互動式動畫工具";
+    // 使用電影場記板 (Clapperboard) 圖示
+    animationToggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4.982 1.566a.5.5 0 0 0-.964 0l-1.5 3A.5.5 0 0 0 3 5h10a.5.5 0 0 0 .482-.434l-1.5-3a.5.5 0 0 0-.964 0l-1.5 3H4.982ZM13.5 6H2.5a.5.5 0 0 0 0 1h11a.5.5 0 0 0 0-1ZM2 8.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h12a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5H2Z"/></svg>`;
+    animationToggle.style.cssText = `width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; background: rgba(255, 255, 255, 0.95); color: #374151; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);`;
+
+    // 3. 建立功能面板 (預設隱藏)
+    const animationPanel = document.createElement("div");
+    animationPanel.className = "esri-widget esri-component";
+    animationPanel.style.cssText = `display: none; flex-direction: column; gap: 8px; padding: 12px; background: rgba(225, 225, 225, 0.95); border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); min-width: 150px;`;
+      
+    // 4. 建立面板內的詳細按鈕
+    const startButton = document.createElement("button");
+    startButton.textContent = "開始錄製";
+    startButton.className = "esri-button";
+
+    const addWaypointButton = document.createElement("button");
+    addWaypointButton.textContent = "新增航點";
+    addWaypointButton.className = "esri-button";
+
+    const stopButton = document.createElement("button");
+    stopButton.textContent = "結束錄製";
+    stopButton.className = "esri-button";
+
+    const playButton = document.createElement("button");
+    playButton.textContent = "播放路徑";
+    playButton.className = "esri-button";
+
+    const clearButton = document.createElement("button");
+    clearButton.textContent = "清除路徑";
+    clearButton.className = "esri-button";
+    
+    // 將詳細按鈕加入面板
+    animationPanel.appendChild(startButton);
+    animationPanel.appendChild(addWaypointButton);
+    animationPanel.appendChild(stopButton);
+    animationPanel.appendChild(playButton);
+    animationPanel.appendChild(clearButton);
+
+    // 5. 將主圖示和功能面板加入主容器
+    animationToolsContainer.appendChild(animationToggle);
+    animationToolsContainer.appendChild(animationPanel);
+      
+    // --- 按鈕狀態與互動邏輯 ---
+    function updateButtonStates() {
+        startButton.disabled = isRecording;
+        addWaypointButton.disabled = !isRecording;
+        stopButton.disabled = !isRecording;
+        playButton.disabled = isRecording || customWaypoints.length < 2;
+        clearButton.disabled = isRecording || customWaypoints.length === 0;
+    }
+
+    // 關閉面板的輔助函式
+    const closeAnimationPanel = () => {
+      isAnimationPanelOpen = false;
+      animationPanel.style.display = "none";
+      animationToggle.style.background = "rgba(255, 255, 255, 0.95)";
+      animationToggle.style.color = "#374151";
+    };
+
+    // 主圖示的點擊事件
+    animationToggle.addEventListener("click", () => {
+      isAnimationPanelOpen = !isAnimationPanelOpen;
+      animationPanel.style.display = isAnimationPanelOpen ? "flex" : "none";
+      animationToggle.style.background = isAnimationPanelOpen ? "#397CEA" : "rgba(255, 255, 255, 0.95)";
+      animationToggle.style.color = isAnimationPanelOpen ? "white" : "#374151";
     });
 
-    return measurementContainer;
+    // --- 詳細按鈕的事件監聽 ---
+    startButton.addEventListener("click", () => {
+        isRecording = true;
+        customWaypoints = [];
+        updateButtonStates();
+        showLayerError("錄製模式已開啟！請移動視角後點擊「新增航點」。");
+    });
+
+    addWaypointButton.addEventListener("click", () => {
+        if (!isRecording) return;
+        const camera = view.camera.clone();
+        customWaypoints.push({ camera });
+        showLayerError(`已新增航點 ${customWaypoints.length}`);
+        updateButtonStates();
+    });
+
+    stopButton.addEventListener("click", () => {
+        if (!isRecording) return;
+        isRecording = false;
+        showLayerError(`錄製結束，共 ${customWaypoints.length} 個航點。`);
+        updateButtonStates();
+        closeAnimationPanel(); // 結束錄製後關閉面板
+    });
+
+    clearButton.addEventListener("click", () => {
+        isRecording = false;
+        customWaypoints = [];
+        showLayerError("已清除所有自訂航點。");
+        updateButtonStates();
+        closeAnimationPanel(); // 清除後關閉面板
+    });
+
+    playButton.addEventListener("click", async () => {
+        if (customWaypoints.length < 2) {
+            showLayerError("路徑至少需要 2 個航點才能播放。");
+            return;
+        }
+        closeAnimationPanel(); // 開始播放時關閉面板
+        view.ui.enabled = false;
+        showLoadingMessage("正在播放自訂路徑...");
+
+        for (const waypoint of customWaypoints) {
+            await view.goTo(waypoint.camera, { speedFactor: 0.5, easing: "linear" });
+        }
+
+        hideLoadingMessage();
+        view.ui.enabled = true;
+    });
+
+    // --- 初始化 ---
+    updateButtonStates();
+    return animationToolsContainer;
   }
 
   // ---------- UI組件註冊 ----------
   view.when(() => {
     addAvailableBuildings();
     const rightPanel = createRightSidePanel();
-    const measurementTools = createMeasurementTools();
 
     // 將測量工具加入到左上角位置
+    const measurementTools = createMeasurementTools();
     view.ui.add(measurementTools, "top-left");
+      
+    // 將新的動畫工具加入到左上角位置
+    const animationTools = createInteractiveAnimationTools();
+    view.ui.add(animationTools, "top-left");
 
     let terrainUpdateTimeout;
-
     rightPanel.terrainSlider.addEventListener("input", function() {
         const exaggerationValue = parseFloat(this.value);
         rightPanel.terrainValueDisplay.textContent = `${exaggerationValue.toFixed(1)}x`;
@@ -461,15 +506,12 @@ require([
         clearTimeout(terrainUpdateTimeout);
         terrainUpdateTimeout = setTimeout(() => {
             showLoadingMessage("地形調整中，請稍後...");
-
             const newElevationLayer = new ExaggeratedElevationLayer({
                 url: "https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer",
                 exaggeration: exaggerationValue
             });
-            
             map.ground.layers.removeAll();
             map.ground.layers.add(newElevationLayer);
-
             const watcher = view.watch("updating", (isUpdating) => {
                 if (isUpdating === false) {
                     hideLoadingMessage();
