@@ -6,6 +6,9 @@ require([
   "esri/widgets/LayerList",
   "esri/widgets/Legend",
   "esri/widgets/BasemapGallery",
+  "esri/widgets/DirectLineMeasurement3D",
+  "esri/widgets/AreaMeasurement3D",
+  "esri/widgets/Expand",
   "esri/Basemap",
   "esri/geometry/Extent",
   "esri/layers/SceneLayer",
@@ -17,7 +20,7 @@ require([
   "esri/layers/ElevationLayer",
   "esri/Ground"
 ], function(
-  esriConfig, Map, SceneView, LayerList, Legend, BasemapGallery, Basemap, Extent, SceneLayer, GroupLayer,
+  esriConfig, Map, SceneView, LayerList, Legend, BasemapGallery, DirectLineMeasurement3D, AreaMeasurement3D, Expand, Basemap, Extent, SceneLayer, GroupLayer,
   SimpleRenderer, MeshSymbol3D, FillSymbol3DLayer, layers, ElevationLayer, Ground
 ) {
   // CORS 設定
@@ -279,10 +282,173 @@ require([
     return { layerListContainer, basemapContainer, basemapSlider, terrainSlider, terrainValueDisplay };
   }
 
+  // 建立測量工具
+  function createMeasurementTools() {
+    // 建立距離測量工具
+    const distanceMeasurement = new DirectLineMeasurement3D({
+      view: view
+    });
+
+    // 建立面積測量工具
+    const areaMeasurement = new AreaMeasurement3D({
+      view: view
+    });
+
+    // 建立測量工具容器
+    const measurementContainer = document.createElement("div");
+    measurementContainer.className = "measurement-tools";
+    measurementContainer.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    `;
+
+    // 建立測量面板
+    const measurementPanel = document.createElement("div");
+    measurementPanel.className = "esri-widget esri-component";
+    measurementPanel.style.cssText = `
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px;
+      background: rgba(225, 225, 225, 0.95);
+      border-radius: 4px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      min-width: 150px;
+    `;
+
+    // 建立距離測量按鈕
+    const distanceButton = document.createElement("button");
+    distanceButton.textContent = "距離測量";
+    distanceButton.style.cssText = `
+      padding: 8px 12px;
+      background:rgba(255, 255, 255, 0.95);
+      color: black;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    `;
+
+    // 建立面積測量按鈕
+    const areaButton = document.createElement("button");
+    areaButton.textContent = "面積測量";
+    areaButton.style.cssText = `
+      padding: 8px 12px;
+      background:rgba(255, 255, 255, 0.95);
+      color: black;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    `;
+
+    // 建立清除按鈕
+    const clearButton = document.createElement("button");
+    clearButton.textContent = "清除測量";
+    clearButton.style.cssText = `
+      padding: 8px 12px;
+      background:rgba(255, 255, 255, 0.95);
+      color: black;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    `;
+
+    measurementPanel.appendChild(distanceButton);
+    measurementPanel.appendChild(areaButton);
+    measurementPanel.appendChild(clearButton);
+
+    // 建立主測量按鈕
+    const measurementToggle = document.createElement("button");
+    measurementToggle.className = "esri-widget esri-component";
+    measurementToggle.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 3l18 18"/>
+        <path d="M21 3L3 21"/>
+        <circle cx="9" cy="9" r="2"/>
+        <circle cx="15" cy="15" r="2"/>
+      </svg>
+    `;
+    measurementToggle.title = "測量工具";
+    measurementToggle.style.cssText = `
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      background: rgba(255, 255, 255, 0.95);
+      color: #374151;
+      border-radius: 4px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    `;
+
+    measurementContainer.appendChild(measurementToggle);
+    measurementContainer.appendChild(measurementPanel);
+
+    let activeWidget = null;
+    let isPanelOpen = false;
+
+    // 主按鈕切換面板
+    measurementToggle.addEventListener("click", () => {
+      isPanelOpen = !isPanelOpen;
+      measurementPanel.style.display = isPanelOpen ? "flex" : "none";
+      measurementToggle.style.background = isPanelOpen ? "#397CEA" : "rgba(255, 255, 255, 0.95)";
+      measurementToggle.style.color = isPanelOpen ? "white" : "#374151";
+    });
+
+    // 距離測量按鈕事件
+    distanceButton.addEventListener("click", () => {
+      if (activeWidget) {
+        activeWidget.viewModel.clear();
+      }
+      activeWidget = distanceMeasurement;
+      distanceMeasurement.viewModel.start();
+      isPanelOpen = false;
+      measurementPanel.style.display = "none";
+      measurementToggle.style.background = "rgba(255, 255, 255, 0.95)";
+      measurementToggle.style.color = "#374151";
+    });
+
+    // 面積測量按鈕事件
+    areaButton.addEventListener("click", () => {
+      if (activeWidget) {
+        activeWidget.viewModel.clear();
+      }
+      activeWidget = areaMeasurement;
+      areaMeasurement.viewModel.start();
+      isPanelOpen = false;
+      measurementPanel.style.display = "none";
+      measurementToggle.style.background = "rgba(255, 255, 255, 0.95)";
+      measurementToggle.style.color = "#374151";
+    });
+
+    // 清除按鈕事件
+    clearButton.addEventListener("click", () => {
+      distanceMeasurement.viewModel.clear();
+      areaMeasurement.viewModel.clear();
+      activeWidget = null;
+      isPanelOpen = false;
+      measurementPanel.style.display = "none";
+      measurementToggle.style.background = "rgba(255, 255, 255, 0.95)";
+      measurementToggle.style.color = "#374151";
+    });
+
+    return measurementContainer;
+  }
+
   // ---------- UI組件註冊 ----------
   view.when(() => {
     addAvailableBuildings();
     const rightPanel = createRightSidePanel();
+    const measurementTools = createMeasurementTools();
+
+    // 將測量工具加入到左上角位置
+    view.ui.add(measurementTools, "top-left");
 
     let terrainUpdateTimeout;
 
