@@ -261,7 +261,7 @@ const riverWeirRestorationGroup = new GroupLayer({
     visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
-        color: [0,0,0,1], width: 5, style: "solid"
+        color: [0,0,0,1], width: 2, style: "solid"
       })
     }),
     popupTemplate: { title: "{名稱}", content: "OID：{OBJECTID}" }

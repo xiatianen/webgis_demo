@@ -12,6 +12,10 @@ html, body, #viewDiv {
   display: none !important;
 }
 
+:root {
+  --calcite-color-brand: transparent !important; /* 完全透明，也可以改成你想要的顏色 */
+}
+
 /* --- 2. 面板佈局樣式 (從原始 JS 的 cssText 轉換而來) --- */
 .panel-toggle-button {
   position: fixed;
@@ -45,12 +49,13 @@ html, body, #viewDiv {
   height: calc(100vh - 44px); /* 用 calc() 計算剩餘高度 */
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
-  border-left: 1px solid rgba(229, 231, 235, 0.8);
+  border-left: 0px solid rgba(0, 0, 0, 0.8);
   z-index: 999; /* 維持不變，比 header 低即可 */
   transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.15);
 }
 
 .panel-header {
@@ -180,19 +185,22 @@ input[type="range"].opacity-slider { /* 給予 slider 一個 class 以便選取 
 
 /* --- 3. 細節與互動樣式 (從原始 JS 的 <style> 標籤合併而來) --- */
 .panel-toggle-button:hover {
+  background: rgba(255, 255, 255, 0.95) !important;
   transform: translateX(-0px) scale(1);
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
 }
+
+
 
 .right-side-panel .panel-header button:hover {
   background: #404040 !important;
   border-color: #6e6e6e !important;
 }
 
-/* 底圖庫：採用兩欄網格佈局 (此設定來自您原始 main.js，將覆蓋舊的 flex 設定) */
+/* 底圖庫：採用三欄網格佈局 (此設定來自您原始 main.js，將覆蓋舊的 flex 設定) */
 .right-side-panel .basemap-selector .esri-basemap-gallery__item-container {
   display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
+  grid-template-columns: repeat(3, 1fr) !important;
   gap: 12px !important;
 }
 
@@ -201,13 +209,14 @@ input[type="range"].opacity-slider { /* 給予 slider 一個 class 以便選取 
   border-radius: 12px !important;
   overflow: hidden !important;
   transition: all 0.3s ease !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
 }
 
 .right-side-panel .basemap-selector .esri-basemap-gallery__item:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
 }
+
+
 
 /* 滑桿 Thumb 樣式 */
 .right-side-panel input[type="range"]::-webkit-slider-thumb {
@@ -258,7 +267,6 @@ input[type="range"].opacity-slider { /* 給予 slider 一個 class 以便選取 
 
 .right-side-panel .layer-list-container .esri-layer-list__item:hover {
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  transform: translateX(4px);
 }
 
 .right-side-panel .layer-list-container .esri-layer-list__item::before {
@@ -293,3 +301,16 @@ input[type="range"].opacity-slider { /* 給予 slider 一個 class 以便選取 
   transform: translateY(-2px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
 }
+
+/* 圖例 */
+
+.esri-legend {
+  opacity: 0.975 !important;
+}
+
+/* Zoom */
+
+.esri-zoom {
+  opacity: 0.95 !important;
+}
+

@@ -65,6 +65,15 @@ require([
     camera: {
       position: { longitude: 121.05, latitude: 24.9, z: 3500 },
       tilt: 65
+    },
+    // 這一段就是重點
+    environment: {
+      background: {
+        type: "color",  // 這句一定要有！
+        color: [0, 0, 0, 1] // 這裡設成全白，想換灰色就改RGB
+      },
+      starsEnabled: false,    // 不顯示星星
+      atmosphereEnabled: false // 不顯示大氣
     }
   });
 
@@ -190,8 +199,8 @@ require([
       isPanelOpen = !isPanelOpen;
       sidePanel.style.right = isPanelOpen ? "0" : "-420px";
       toggleButton.style.right = isPanelOpen ? "420px" : "20px";
-      toggleButton.style.background = isPanelOpen ? "rgba(59, 130, 246, 0.9)" : "rgba(255, 255, 255, 0.95)";
-      toggleButton.style.color = isPanelOpen ? "white" : "#374151";
+      toggleButton.style.background = isPanelOpen ? "rgba(255, 255, 255, 0.9)" : "rgba(255, 255, 255, 0.95)";
+      toggleButton.style.color = isPanelOpen ? "#374151" : "#374151";
       toggleButton.innerHTML = isPanelOpen
         ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>`
         : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>`;
@@ -199,11 +208,6 @@ require([
 
     toggleButton.addEventListener("click", togglePanel);
     closeButton.addEventListener("click", togglePanel);
-    document.addEventListener("click", (event) => {
-      if (isPanelOpen && !sidePanel.contains(event.target) && !toggleButton.contains(event.target)) {
-        togglePanel();
-      }
-    });
 
     return { layerListContainer, basemapContainer, slider };
   }
@@ -239,11 +243,18 @@ require([
     new BasemapGallery({
       view,
       container: rightPanel.basemapContainer,
-      source: [Basemap.fromId("osm"), Basemap.fromId("satellite")]
+      source: [Basemap.fromId("osm"), Basemap.fromId("satellite"), Basemap.fromId("gray")]
     });
 
     // 保留圖例在左下角
-    view.ui.add(new Legend({ view }), "bottom-left");
+    // 只顯示非「建物圖層」的圖例
+    const legend = new Legend({
+      view,
+      layerInfos: map.layers
+      .filter(layer => layer.title !== "建物圖層")
+      .map(layer => ({ layer }))
+    });
+    view.ui.add(legend, "bottom-left");
 
     // 底圖變更時保持透明度
     map.watch("basemap", (newBasemap) => {
