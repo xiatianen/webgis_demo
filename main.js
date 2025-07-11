@@ -1,4 +1,4 @@
-// main.js (已將動畫工具改為 Icon 展開模式)
+
 require([
   "esri/config",
   "esri/Map",
@@ -120,8 +120,8 @@ require([
   function showLoadingMessage(message) {
     if (loadingNode) { return; }
     loadingNode = document.createElement('div');
+    loadingNode.className = 'loading-message'; // REFACTORED: Use class
     loadingNode.innerText = message;
-    loadingNode.style = "position:fixed;top:16px;left:50%;transform:translateX(-50%);background:rgba(30,30,30,0.8);color:white;padding:10px 25px;border-radius:8px;z-index:10000;font-size:15px;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.3);";
     document.body.appendChild(loadingNode);
   }
 
@@ -153,8 +153,8 @@ require([
   // 顯示提示訊息
   function showLayerError(msg, duration = 2000) {
     const node = document.createElement('div');
+    node.className = 'layer-error-message'; // REFACTORED: Use class
     node.innerText = msg;
-    node.style = "position:fixed;top:16px;right:16px;background:#e6f4ff;color:#0062cc;padding:8px 20px;border-radius:8px;z-index:9999;font-size:14px;border: 1px solid #b3d7ff;";
     document.body.appendChild(node);
     setTimeout(() => { node.remove(); }, duration);
   }
@@ -164,8 +164,6 @@ require([
     const toggleButton = document.createElement("button");
     toggleButton.className = "esri-widget esri-component panel-toggle-button";
     toggleButton.innerHTML = `<img src="icon/layers.svg" width="25" height="25" alt="圖層">`;
-    toggleButton.style.fontWeight = "bold";
-    toggleButton.style.fontSize = "15px";
 
     const sidePanel = document.createElement("div");
     sidePanel.className = "esri-widget esri-component right-side-panel";
@@ -254,6 +252,7 @@ require([
     document.body.appendChild(toggleButton);
     document.body.appendChild(sidePanel);
     
+    // RETAINED: Dynamic style based on value
     basemapSlider.addEventListener("input", function() {
       const opacity = parseFloat(this.value) / 100;
       valueDisplay.textContent = this.value + "%";
@@ -263,17 +262,16 @@ require([
       }
     });
     
+    // RETAINED: Initial dynamic style
     basemapSlider.style.background = `linear-gradient(to right, #3b82f6 100%, #e5e7eb 100%)`;
     const terrainPercentage = ((initialExaggeration - terrainSlider.min) / (terrainSlider.max - terrainSlider.min)) * 100;
     terrainSlider.style.background = `linear-gradient(to right, #3b82f6 ${terrainPercentage}%, #e5e7eb ${terrainPercentage}%)`;
 
     let isPanelOpen = true; // 預設為展開
+    // REFACTORED: Use classList to toggle state
     const updatePanelUI = () => {
-      sidePanel.style.right = isPanelOpen ? "0" : "-420px";
-      toggleButton.style.right = isPanelOpen ? "420px" : "20px";
-      toggleButton.style.background = isPanelOpen ? "rgba(255, 255, 255, 0.9)" : "rgba(255, 255, 255, 0.95)";
-      toggleButton.style.color = "#374151";
-      // 按鈕維持「設定」二字
+      sidePanel.classList.toggle('is-open', isPanelOpen);
+      toggleButton.classList.toggle('is-open', isPanelOpen);
       toggleButton.innerHTML = `<img src="icon/layers.svg" width="25" height="25" alt="圖層">`;
     };
     const togglePanel = () => {
@@ -293,45 +291,54 @@ require([
   function createMeasurementTools() {
     const distanceMeasurement = new DirectLineMeasurement3D({ view: view });
     const areaMeasurement = new AreaMeasurement3D({ view: view });
+    
     const measurementContainer = document.createElement("div");
-    measurementContainer.className = "measurement-tools";
-    measurementContainer.style.cssText = `display: flex; flex-direction: column; gap: 4px;`;
+    measurementContainer.className = "tool-container";
+
     const measurementPanel = document.createElement("div");
-    measurementPanel.className = "esri-widget esri-component";
-    measurementPanel.style.cssText = `display: none; flex-direction: column; gap: 8px; padding: 12px; background: rgba(225, 225, 225, 0.95); border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); min-width: 150px;`;
+    measurementPanel.className = "esri-widget esri-component tool-panel";
+
     const distanceButton = document.createElement("button");
     distanceButton.textContent = "距離測量";
-    distanceButton.style.cssText = `padding: 8px 12px; background:rgba(255, 255, 255, 0.95); color: black; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;`;
+    distanceButton.className = "esri-button";
+
     const areaButton = document.createElement("button");
     areaButton.textContent = "面積測量";
-    areaButton.style.cssText = `padding: 8px 12px; background:rgba(255, 255, 255, 0.95); color: black; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;`;
+    areaButton.className = "esri-button";
+
     const clearButton = document.createElement("button");
     clearButton.textContent = "清除測量";
-    clearButton.style.cssText = `padding: 8px 12px; background:rgba(255, 255, 255, 0.95); color: black; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;`;
+    clearButton.className = "esri-button";
+
     measurementPanel.appendChild(distanceButton);
     measurementPanel.appendChild(areaButton);
     measurementPanel.appendChild(clearButton);
+
     const measurementToggle = document.createElement("button");
-    measurementToggle.className = "esri-widget esri-component";
+    measurementToggle.className = "esri-widget esri-component tool-toggle-button";
     measurementToggle.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l18 18"/><path d="M21 3L3 21"/><circle cx="9" cy="9" r="2"/><circle cx="15" cy="15" r="2"/></svg>`;
     measurementToggle.title = "測量工具";
-    measurementToggle.style.cssText = `width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; background: rgba(255, 255, 255, 0.95); color: #374151; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);`;
+
     measurementContainer.appendChild(measurementToggle);
     measurementContainer.appendChild(measurementPanel);
+
     let activeWidget = null;
     let isPanelOpen = false;
-    measurementToggle.addEventListener("click", () => {
-      isPanelOpen = !isPanelOpen;
-      measurementPanel.style.display = isPanelOpen ? "flex" : "none";
-      measurementToggle.style.background = isPanelOpen ? "#397CEA" : "rgba(255, 255, 255, 0.95)";
-      measurementToggle.style.color = isPanelOpen ? "white" : "#374151";
-    });
+
+    // REFACTORED: Use classList to toggle state
+    function togglePanel() {
+        isPanelOpen = !isPanelOpen;
+        measurementPanel.classList.toggle('is-active', isPanelOpen);
+        measurementToggle.classList.toggle('is-active', isPanelOpen);
+    }
     const closeMeasurementPanel = () => {
       isPanelOpen = false;
-      measurementPanel.style.display = "none";
-      measurementToggle.style.background = "rgba(255, 255, 255, 0.95)";
-      measurementToggle.style.color = "#374151";
+      measurementPanel.classList.remove('is-active');
+      measurementToggle.classList.remove('is-active');
     };
+
+    measurementToggle.addEventListener("click", togglePanel);
+
     distanceButton.addEventListener("click", () => {
       if (activeWidget) activeWidget.viewModel.clear();
       activeWidget = distanceMeasurement;
@@ -361,25 +368,17 @@ require([
     let isAnimationPanelOpen = false;
 
     // --- 建立 UI 元素 (仿照測量工具的結構) ---
-    // 1. 建立主容器
     const animationToolsContainer = document.createElement("div");
-    animationToolsContainer.className = "animation-tools";
-    animationToolsContainer.style.cssText = "display: flex; flex-direction: column; gap: -4px; margin-top: -9px;";
+    animationToolsContainer.className = "tool-container animation-tools"; // Use shared and specific classes
 
-    // 2. 建立主圖示 (切換按鈕)
     const animationToggle = document.createElement("button");
-    animationToggle.className = "esri-widget esri-component";
+    animationToggle.className = "esri-widget esri-component tool-toggle-button";
     animationToggle.title = "互動式動畫工具";
-    // 使用電影場記板 (Clapperboard) 圖示
     animationToggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4.982 1.566a.5.5 0 0 0-.964 0l-1.5 3A.5.5 0 0 0 3 5h10a.5.5 0 0 0 .482-.434l-1.5-3a.5.5 0 0 0-.964 0l-1.5 3H4.982ZM13.5 6H2.5a.5.5 0 0 0 0 1h11a.5.5 0 0 0 0-1ZM2 8.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h12a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5H2Z"/></svg>`;
-    animationToggle.style.cssText = `width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; background: rgba(255, 255, 255, 0.95); color: #374151; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);`;
 
-    // 3. 建立功能面板 (預設隱藏)
     const animationPanel = document.createElement("div");
-    animationPanel.className = "esri-widget esri-component";
-    animationPanel.style.cssText = `display: none; flex-direction: column; gap: 8px; padding: 12px; background: rgba(225, 225, 225, 0.95); border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); min-width: 150px;`;
+    animationPanel.className = "esri-widget esri-component tool-panel";
       
-    // 4. 建立面板內的詳細按鈕
     const startButton = document.createElement("button");
     startButton.textContent = "開始錄製";
     startButton.className = "esri-button";
@@ -400,14 +399,12 @@ require([
     clearButton.textContent = "清除路徑";
     clearButton.className = "esri-button";
     
-    // 將詳細按鈕加入面板
     animationPanel.appendChild(startButton);
     animationPanel.appendChild(addWaypointButton);
     animationPanel.appendChild(stopButton);
     animationPanel.appendChild(playButton);
     animationPanel.appendChild(clearButton);
 
-    // 5. 將主圖示和功能面板加入主容器
     animationToolsContainer.appendChild(animationToggle);
     animationToolsContainer.appendChild(animationPanel);
       
@@ -420,20 +417,17 @@ require([
         clearButton.disabled = isRecording || customWaypoints.length === 0;
     }
 
-    // 關閉面板的輔助函式
+    // REFACTORED: Use classList to toggle state
     const closeAnimationPanel = () => {
       isAnimationPanelOpen = false;
-      animationPanel.style.display = "none";
-      animationToggle.style.background = "rgba(255, 255, 255, 0.95)";
-      animationToggle.style.color = "#374151";
+      animationPanel.classList.remove('is-active');
+      animationToggle.classList.remove('is-active');
     };
 
-    // 主圖示的點擊事件
     animationToggle.addEventListener("click", () => {
       isAnimationPanelOpen = !isAnimationPanelOpen;
-      animationPanel.style.display = isAnimationPanelOpen ? "flex" : "none";
-      animationToggle.style.background = isAnimationPanelOpen ? "#397CEA" : "rgba(255, 255, 255, 0.95)";
-      animationToggle.style.color = isAnimationPanelOpen ? "white" : "#374151";
+      animationPanel.classList.toggle('is-active', isAnimationPanelOpen);
+      animationToggle.classList.toggle('is-active', isAnimationPanelOpen);
     });
 
     // --- 詳細按鈕的事件監聽 ---
@@ -503,30 +497,50 @@ require([
     const animationTools = createInteractiveAnimationTools();
     view.ui.add(animationTools, "top-left");
 
+    // 修正地形誇張化的事件監聽器部分
     let terrainUpdateTimeout;
     rightPanel.terrainSlider.addEventListener("input", function() {
-        const exaggerationValue = parseFloat(this.value);
-        rightPanel.terrainValueDisplay.textContent = `${exaggerationValue.toFixed(1)}x`;
-        const percentage = ((exaggerationValue - this.min) / (this.max - this.min)) * 100;
-        this.style.background = `linear-gradient(to right, #3b82f6 ${percentage}%, #e5e7eb ${percentage}%)`;
+      const exaggerationValue = parseFloat(this.value);
+      rightPanel.terrainValueDisplay.textContent = `${exaggerationValue.toFixed(1)}x`;
+      const percentage = ((exaggerationValue - this.min) / (this.max - this.min)) * 100;
+      this.style.background = `linear-gradient(to right, #3b82f6 ${percentage}%, #e5e7eb ${percentage}%)`;
 
-        clearTimeout(terrainUpdateTimeout);
-        terrainUpdateTimeout = setTimeout(() => {
-            showLoadingMessage("地形調整中，請稍後...");
-            const newElevationLayer = new ExaggeratedElevationLayer({
-                url: "https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer",
-                exaggeration: exaggerationValue
-            });
-            map.ground.layers.removeAll();
-            map.ground.layers.add(newElevationLayer);
-            const watcher = view.watch("updating", (isUpdating) => {
-                if (isUpdating === false) {
-                    hideLoadingMessage();
-                    watcher.remove();
-                }
-            });
-        }, 400);
+      clearTimeout(terrainUpdateTimeout);
+      terrainUpdateTimeout = setTimeout(() => {
+        showLoadingMessage("地形調整中，請稍後...");
+        
+        const newElevationLayer = new ExaggeratedElevationLayer({
+          url: "https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer",
+          exaggeration: exaggerationValue
+        });
+        
+        // 移除舊的地形圖層
+        map.ground.layers.removeAll();
+        map.ground.layers.add(newElevationLayer);
+
+        // 即時同步檢查機制
+        const checkAndHideLoading = () => {
+          // 檢查視圖是否不再更新中
+          if (!view.updating) {
+            hideLoadingMessage();
+            return;
+          }
+          
+          // 立即再次檢查（使用requestAnimationFrame保持同步）
+          requestAnimationFrame(checkAndHideLoading);
+        };
+        
+        // 立即開始檢查
+        requestAnimationFrame(checkAndHideLoading);
+        
+        // 安全退出機制：1秒後強制隱藏
+        setTimeout(() => {
+          hideLoadingMessage();
+        }, 1000);
+        
+      }, 400);
     });
+
 
     new LayerList({
       view,
