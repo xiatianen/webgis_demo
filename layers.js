@@ -261,7 +261,7 @@ const riverWeirRestorationGroup = new GroupLayer({
     visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleLineSymbol({
-        color: [0,0,0,1], width: 2, style: "solid"
+        color: [0,0,0,1], width: 2, style: "dash"
       })
     }),
     popupTemplate: { title: "{名稱}", content: "OID：{OBJECTID}" }
@@ -344,7 +344,7 @@ const riverWeirRestorationGroup = new GroupLayer({
   const ponds = new FeatureLayer({
     url: "https://gisportal.triwra.org.tw/server/rest/services/Hosted/ponds/FeatureServer",
     title: "埤塘",
-    visible: false,
+    visible: true,
     renderer: new SimpleRenderer({
       symbol: new SimpleFillSymbol({
         color: [0,120,200,0.3],
@@ -484,7 +484,7 @@ const riverWeirRestorationGroup = new GroupLayer({
   const riverGroup = new GroupLayer({
     title: "河川",
     visibilityMode: "independent",
-    visible: false,
+    visible: true,
     layers: [river_drain, river_branch, river_main]
   });
 

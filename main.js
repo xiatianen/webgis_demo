@@ -163,7 +163,9 @@ require([
   function createRightSidePanel() {
     const toggleButton = document.createElement("button");
     toggleButton.className = "esri-widget esri-component panel-toggle-button";
-    toggleButton.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>`;
+    toggleButton.innerHTML = `<img src="icon/layers.svg" width="25" height="25" alt="圖層">`;
+    toggleButton.style.fontWeight = "bold";
+    toggleButton.style.fontSize = "15px";
 
     const sidePanel = document.createElement("div");
     sidePanel.className = "esri-widget esri-component right-side-panel";
@@ -265,17 +267,21 @@ require([
     const terrainPercentage = ((initialExaggeration - terrainSlider.min) / (terrainSlider.max - terrainSlider.min)) * 100;
     terrainSlider.style.background = `linear-gradient(to right, #3b82f6 ${terrainPercentage}%, #e5e7eb ${terrainPercentage}%)`;
 
-    let isPanelOpen = false;
-    const togglePanel = () => {
-      isPanelOpen = !isPanelOpen;
+    let isPanelOpen = true; // 預設為展開
+    const updatePanelUI = () => {
       sidePanel.style.right = isPanelOpen ? "0" : "-420px";
       toggleButton.style.right = isPanelOpen ? "420px" : "20px";
       toggleButton.style.background = isPanelOpen ? "rgba(255, 255, 255, 0.9)" : "rgba(255, 255, 255, 0.95)";
-      toggleButton.style.color = isPanelOpen ? "#374151" : "#374151";
-      toggleButton.innerHTML = isPanelOpen
-        ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>`
-        : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>`;
+      toggleButton.style.color = "#374151";
+      // 按鈕維持「設定」二字
+      toggleButton.innerHTML = `<img src="icon/layers.svg" width="25" height="25" alt="圖層">`;
     };
+    const togglePanel = () => {
+      isPanelOpen = !isPanelOpen;
+      updatePanelUI();
+    };
+    // **初始化呼叫一次讓 panel 展開**
+    updatePanelUI();
 
     toggleButton.addEventListener("click", togglePanel);
     closeButton.addEventListener("click", togglePanel);
