@@ -101,8 +101,9 @@ require([
       spatialReference: { wkid: 4326 }
     }),
     camera: {
-      position: { longitude: 121.05, latitude: 24.9, z: 3500 },
-      tilt: 65
+      position: { longitude: 120.84, latitude: 25.095, z: 14000},
+      tilt: 63.5,
+      heading: 140
     },
     environment: {
       background: {
