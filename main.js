@@ -1,4 +1,3 @@
-
 require([
   "esri/config",
   "esri/Map",
@@ -567,13 +566,38 @@ require([
       source: [Basemap.fromId("osm"), Basemap.fromId("satellite"), Basemap.fromId("gray")]
     });
     
+    // 建立圖例
     const legend = new Legend({
       view,
       layerInfos: map.layers
         .filter(layer => layer.title !== "建物圖層")
         .map(layer => ({ layer }))
     });
+    
+    // 將圖例加入到左下角位置
     view.ui.add(legend, "bottom-left");
+    
+    // 設定圖例和測量工具的z-index層級
+    view.when(() => {
+      // 設定圖例較低的z-index
+      const legendElement = legend.container;
+      if (legendElement) {
+        legendElement.style.zIndex = "1";
+        legendElement.classList.add("legend-container");
+      }
+      
+      // 確保測量工具有更高的z-index
+      const measurementToolElements = document.querySelectorAll('.tool-container');
+      measurementToolElements.forEach(element => {
+        element.style.zIndex = "999";
+      });
+      
+      // 也確保測量工具面板有正確的z-index
+      const toolPanels = document.querySelectorAll('.tool-panel');
+      toolPanels.forEach(panel => {
+        panel.style.zIndex = "1000";
+      });
+    });
     
     map.watch("basemap", (newBasemap) => {
       const currentOpacity = parseFloat(rightPanel.basemapSlider.value) / 100;
